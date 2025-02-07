@@ -7,32 +7,7 @@ global class TripUpdateBatchJob implements Database.Batchable<SObject>, Schedula
 
 
     global void execute(Database.BatchableContext BC, List<Trip__c> trips) {
-        List<Trip__c> tripsToUpdate = new List<Trip__c>();
-        Date today = Date.today();
-        System.debug('Trip size' + trips.size());
-        for (Trip__c trip : trips) {       
-
-            // Vérifie si la date actuelle est inférieure à la date de début (A venir)
-            if (today < trip.startDate__c) {
-                trip.status__c = 'A venir';
-                tripsToUpdate.add(trip);
-            }
-            // Vérifie si la date actuelle est entre la date de début et la date de fin (En cours)
-            else if (today >= trip.startDate__c && today <= trip.endDate__c) {
-                trip.status__c = 'En cours';
-                tripsToUpdate.add(trip);
-            }
-            // Vérifie si la date actuelle est supérieure à la date de fin (Terminé)
-            else if (today > trip.endDate__c) {
-                trip.status__c = 'Terminé';
-                tripsToUpdate.add(trip);
-            }
-        }
-
-        
-        if (!tripsToUpdate.isEmpty()) {
-            update tripsToUpdate;
-        }
+        TripService.executeTripUpdate(trips);       
     }
 
     global void finish(Database.BatchableContext BC) {

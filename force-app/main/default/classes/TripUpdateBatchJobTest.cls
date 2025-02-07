@@ -3,40 +3,34 @@ private class TripUpdateBatchJobTest {
 
     @TestSetup
     static void setup() {
-
-        TestDataFactory.createTripUpdateBatchJobTestCase1();
+     
         TestDataFactory.createTripUpdateBatchJobTestCase2();
         TestDataFactory.createTripUpdateBatchJobTestCase3();
-
-        //lancement du batch
-        TripUpdateBatchJob batch = new TripUpdateBatchJob();
-        Database.executeBatch(batch);
+        TestDataFactory.createTripUpdateBatchJobTestCase1();        
     
     }
 
 
     @IsTest
     static void testCase1() {
-        Test.startTest();
-        Trip__c results=[select id, name,Status__c from trip__c where name='tripTestCase1' and Status__c='A venir'];        
+  
+    Test.startTest();
+        //lancement du batch
+        TripUpdateBatchJob batch = new TripUpdateBatchJob();
+        Database.executeBatch(batch);
+    
+        List<Trip__c> results=[select id, name,Status__c from trip__c ];        
         Test.stopTest();
-        System.assertNotEquals(null, results,'La liste des résultats ne doit pas être nulle' );
-    }
+        System.assert(results.size() == 3, 'La liste result doit contenir 3 trips.');
 
-    @IsTest
-    static void testCase2() {
-        Test.startTest();
-        Trip__c results=[select id, name,Status__c from trip__c where name='tripTestCase2' and Status__c='En cours'];        
-        Test.stopTest();
-        System.assertNotEquals(null, results,'La liste des résultats ne doit pas être nulle' );
-    }
+        List<Trip__c> results1=[select id, name,Status__c from trip__c where Status__c='A venir'];     
+        System.assertEquals(1, results1.size(), 'La liste result doit contenir 1 ligne.');
 
-    @IsTest
-    static void testCase3() {
-        Test.startTest();
-        Trip__c results=[select id, name,Status__c from trip__c where name='tripTestCase3' and Status__c='Terminé'];        
-        Test.stopTest();
-        System.assertNotEquals(null, results,'La liste des résultats ne doit pas être nulle' );
+        List<Trip__c>  results2=[select id, name,Status__c from trip__c where Status__c='En cours'];     
+        System.assertEquals(1, results2.size(), 'La liste result doit contenir 1 ligne.');
+
+        List<Trip__c>  results3=[select id, name,Status__c from trip__c where Status__c='Terminé'];     
+        System.assertEquals(1, results3.size(), 'La liste result doit contenir 1 ligne.');
     }
 
 }

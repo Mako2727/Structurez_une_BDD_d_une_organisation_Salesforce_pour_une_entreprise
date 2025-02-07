@@ -2,7 +2,7 @@ public class TripSelector {
     
     // Méthode pour récupérer les voyages à venir dans les 7 prochains jours
     public static Database.QueryLocator getUpcomingTrips() {
-        return Database.getQueryLocator('SELECT Id, Status__c, startDate__c, numberOfParticipants__c FROM Trip__c WHERE startDate__c = NEXT_N_DAYS:7');
+        return Database.getQueryLocator('SELECT Id, Status__c, startDate__c, numberOfParticipants__c FROM Trip__c WHERE startDate__c >= TODAY AND startDate__c <= NEXT_N_DAYS:7');
     }
 
 

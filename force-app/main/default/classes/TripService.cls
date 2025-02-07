@@ -3,48 +3,39 @@ public with sharing class TripService {
     public class TripValidationException extends Exception {
     }
 
-    public void validateTrip(List<Trip__c> TripIds) {
+    public static void executeTripCanceled(List<Trip__c> trips) {
+        List<Trip__c> tripsToCancel = new List<Trip__c>();        
+        for (Trip__c trip : trips) {
+            if (trip.numberOfParticipants__c < 10) {
+                trip.Status__c = 'Annulé';
+                tripsToCancel.add(trip);
+            }
+        }
+        
+        if (!tripsToCancel.isEmpty()) {
+            update tripsToCancel;
+        }
 
+    }
+
+    public void validateTrip(List<Trip__c> TripIds) {
         for (Trip__c trip : TripIds) {
-            System.debug( 'Dans la boucle For....' );
             // Vérification pour l'événement Insert
-            if (Trigger.isInsert) {
-               try {
-                 System.debug( 'isInsert trip.startDate__c==' +trip.startDate__c );                    
-                System.debug( 'isInsert trip.endDate__c==' +trip.endDate__c );    
+            if (Trigger.isInsert) {      
                      // Vérifier que la date de fin est après la date de début
-                            if ((trip.endDate__c != null && trip.startDate__c != null) && trip.endDate__c < trip.startDate__c ) {
-                                System.debug( 'insertion Trip ko...'  );    
-                                trip.addError('Cas  insert....La date de fin doit être après la date de début.');
+                            if ((trip.endDate__c != null && trip.startDate__c != null) && trip.endDate__c < trip.startDate__c ) {                              
+                                trip.addError('Cas  isInsert....La date de fin doit être après la date de début.');
                                 //throw new TripValidationException('Chronologie incorrect!!!!'  );
                             }
-                            else {
-                                System.debug( 'insertion Trip ok...' );    
-                            }
-               } catch (Exception e) {
-                System.debug( 'Erreur insertion...' +e.getMessage() );    
-               }
-               
             }
+
             if (Trigger.isUpdate) {
-                try {
-                     System.debug( 'isUpdate trip.startDate__c==' +trip.startDate__c );                    
-                System.debug( 'isUpdate trip.endDate__c==' +trip.endDate__c );  
-    
                 // Vérifier que la date de fin est après la date de début
                 if ((trip.endDate__c != null && trip.startDate__c != null) && trip.endDate__c < trip.startDate__c ) {
-                    System.debug( 'insertion Trip ko...'  );    
-                   trip.addError('Cas  insert....La date de fin doit être après la date de début.');
+                   
+                   trip.addError('Cas  isUpdate....La date de fin doit être après la date de début.');
                      //throw new TripValidationException('Chronologie incorrect!!!!'  );
                 }
-                else {
-                    System.debug( 'insertion Trip ok...' );    
-                }
-                } catch (Exception e) {
-                    System.debug( 'Erreur insertion...' +e.getMessage() );    
-                }
-               
-               
             }
         }
     }
@@ -52,7 +43,6 @@ public with sharing class TripService {
 
 
     public void validateTripOnOpportunity(Set<Id> OpportunityIds) {
-
         // Récupérer les objets Opportunity correspondants aux IDs
         List<Opportunity> OpportunitysToProcess = OpportunitySelector.getOpportunityByIds(OpportunityIds);
         for (Opportunity opp : OpportunitysToProcess) {
@@ -70,14 +60,44 @@ public with sharing class TripService {
                                 status__c='A venir' ,
                                 totalCost__c=opp.totalCost__c  
                               );
-                              insert newTrip;
-                              System.debug('Insertion dans newTrip ok');
+                              insert newTrip;                            
 
-                        } catch (Exception ex) {
+                       } catch (Exception ex) {
                              System.debug('Erreur insert ...' + ex.getMessage());
-                             throw new TripValidationException('Les dates ne sont pas dans le bon ordre!!!'   );
+                           throw new TripValidationException('Les dates ne sont pas dans le bon ordre!!!'   );
+                               //TriOpportunity.addError('Les dates ne sont pas dans le bon ordre!!!' );
                         }
                     }
         }
         }
+
+public static void executeTripUpdate(List<Trip__c> trips)
+{
+    List<Trip__c> tripsToUpdate = new List<Trip__c>();
+    Date today = Date.today();
+    for (Trip__c trip : trips) {       
+
+        // Vérifie si la date actuelle est inférieure à la date de début (A venir)
+        if (today < trip.startDate__c) {
+            trip.status__c = 'A venir';
+            tripsToUpdate.add(trip);
+        }
+        // Vérifie si la date actuelle est entre la date de début et la date de fin (En cours)
+        else if (today >= trip.startDate__c && today <= trip.endDate__c) {
+            trip.status__c = 'En cours';
+            tripsToUpdate.add(trip);
+        }
+        // Vérifie si la date actuelle est supérieure à la date de fin (Terminé)
+        else if (today > trip.endDate__c) {
+            trip.status__c = 'Terminé';
+            tripsToUpdate.add(trip);
+        }
+    }
+
+    
+    if (!tripsToUpdate.isEmpty()) {
+        update tripsToUpdate;
+    }
+}
+
 }

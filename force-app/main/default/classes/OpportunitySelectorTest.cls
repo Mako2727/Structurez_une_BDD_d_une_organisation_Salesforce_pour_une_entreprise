@@ -3,7 +3,6 @@ private class OpportunitySelectorTest {
     @TestSetup
     static void setup() {
       TestDataFactory.createTestgetOpportunityByIds();
-
     }
 
 
@@ -21,10 +20,5 @@ private class OpportunitySelectorTest {
 
          // Vérification que la liste retournée contient bien des résultats
          System.assert(result.size() > 0, 'La liste result doit contenir des opportunités.');
-
     }
-
-
-
-
 }

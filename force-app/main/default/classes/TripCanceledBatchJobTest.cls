@@ -5,7 +5,6 @@ private class TripCanceledBatchJobTest {
         TestDataFactory.createTestTripCanceledBatchJob();
     }
 
-
     @IsTest
     static void TripCanceledBatchJob() {
        

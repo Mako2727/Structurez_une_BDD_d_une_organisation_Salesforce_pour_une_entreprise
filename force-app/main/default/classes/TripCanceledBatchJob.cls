@@ -6,24 +6,12 @@ global class TripCanceledBatchJob implements Database.Batchable<SObject>, Schedu
     }
     
     global void execute(Database.BatchableContext BC, List<Trip__c> trips) {
-        List<Trip__c> tripsToCancel = new List<Trip__c>();
-        
-        for (Trip__c trip : trips) {
-            if (trip.numberOfParticipants__c < 10) {
-                trip.Status__c = 'Annulé';
-                tripsToCancel.add(trip);
-            }
-        }
-        
-        if (!tripsToCancel.isEmpty()) {
-            update tripsToCancel;
-        }
+            TripService.executeTripCanceled(trips);       
     }
     
     global void finish(Database.BatchableContext BC) {
         System.debug('Batch Job terminé.');
-    }
-    
+    }    
 
     //replanifie le batch pour la prochaine execution
     global void execute(SchedulableContext sc) {
