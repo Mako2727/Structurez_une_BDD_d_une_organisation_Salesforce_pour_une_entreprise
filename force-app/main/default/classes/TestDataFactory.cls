@@ -7,8 +7,7 @@ public class TestDataFactory {
          Account testAccount = new Account(
             Name = 'Test Account'
         );
-        insert testAccount;       
-
+        insert testAccount;    
         // Création d'une liste d'opportunités
         List<Opportunity> opportunities = new List<Opportunity>();
 
@@ -21,14 +20,10 @@ public class TestDataFactory {
             );
             opportunities.add(opp);
         }
-
         // Insertion des opportunités en une seule fois (meilleure performance)
         insert opportunities;
-
     }
-
-
-
+    
     @IsTest
     public static void createTestTripCanceledBatchJob()
     {
@@ -121,7 +116,8 @@ public class TestDataFactory {
                 Name = 'testvalidateTripOnOpportunity ',
                 AccountId = testAccount.Id,
                 CloseDate = Date.today().addDays(30),
-                StageName = 'Prospecting' // Remplace par un stade valide dans ton org
+                StageName = 'Prospecting', // Remplace par un stade valide dans ton org
+                destination__c='testOppCloseWon'
             );
             opportunities.add(opp);   
         // Insertion des opportunités en une seule fois (meilleure performance)
@@ -192,7 +188,7 @@ public class TestDataFactory {
 
             
         } catch (Exception e) {
-            System.debug('Erreur createTestTripServiceUpdate : ' + e.getMessage());
+            System.debug('Erreur createTestexecuteTripUpdateCase1 : ' + e.getMessage());
         }
     }
     @IsTest
@@ -210,7 +206,7 @@ public class TestDataFactory {
 
             
         } catch (Exception e) {
-            System.debug('Erreur createTestTripServiceUpdate : ' + e.getMessage());
+            System.debug('Erreur createTestexecuteTripUpdateCase2 : ' + e.getMessage());
         }
     }
     @IsTest
@@ -227,7 +223,7 @@ public class TestDataFactory {
             insert trip;
             
         } catch (Exception e) {
-            System.debug('Erreur createTestTripServiceUpdate : ' + e.getMessage());
+            System.debug('Erreur createTestexecuteTripUpdateCase3 : ' + e.getMessage());
         }
     }
 

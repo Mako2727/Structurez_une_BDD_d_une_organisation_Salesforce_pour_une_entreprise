@@ -8,7 +8,7 @@ private class TripSelectorTest {
     @IsTest
     static void testgetUpcomingTrips() {
         Integer tripCount = 0;
-        try {
+      
             Test.startTest();
              Database.QueryLocator result= TripSelector.getUpcomingTrips();
              List<Trip__c> trips = new List<Trip__c>();
@@ -22,17 +22,14 @@ private class TripSelectorTest {
             Test.stopTest();
           // Vérification que la liste retournée contient bien des résultats
           System.assert(trips.size() > 0, 'La liste result doit contenir au moins un trip.');
-        } catch (Exception e) {             
-            // Rethrow l'exception pour ne pas masquer l'échec du test
-            throw e;
-        }
+       
     }
 
 
     @IsTest
     static void testgetAllTrips() {
         Integer tripCount = 0;
-        try {
+       
              Test.startTest();
              Database.QueryLocator result= TripSelector.getAllTrips();
              List<Trip__c> trips = new List<Trip__c>();             
@@ -46,9 +43,6 @@ private class TripSelectorTest {
           // Vérification que la liste retournée contient bien des résultats
           System.assert(trips.size() > 0, 'La liste result doit contenir au moins un trip.');
       
-     } catch (Exception e) {           
-             // Rethrow l'exception pour ne pas masquer l'échec du test
-             throw e;
-        }
+    
     }
 }

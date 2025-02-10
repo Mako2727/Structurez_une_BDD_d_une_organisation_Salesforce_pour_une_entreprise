@@ -5,7 +5,7 @@ trigger OpportunityTrigger on Opportunity(after update) {
     catch (TripService.TripValidationException e) {
         // Ajout de l'erreur à l'objet Opportunity
         for (Opportunity opp : Trigger.new) {
-            opp.addError(e.getMessage());  // Appel de addError sur chaque instance d'Opportunity
+            opp.addError(e.getMessage()); 
         }
     }
   

@@ -76,18 +76,17 @@ private class TripServiceTest {
 
     List<Trip__c> results=[select id, name from trip__c where Status__c='Annulé'];
     System.assert(results.size() > 0, 'La liste des résultats doit contenir au moins un élément.');
-
   }
 
   @IsTest
   static void testvalidateTripServiceOpportunity() {
-    Opportunity opp=[select id, name from Opportunity where name='testvalidateTripOnOpportunity'];
+    Opportunity opp=[select id, name from Opportunity where destination__c = 'testOppCloseWon'];
     Test.startTest();
     opp.StageName='Closed Won';
     update opp;
     Test.stopTest();
 
-    Opportunity results=[select id, name from Opportunity where name='testvalidateTripOnOpportunity' and StageName='Closed Won'];
+    List<Trip__c> results=[select id from trip__c where  Opportunity__c=:opp.id ];
     System.assertNotEquals(null, results,'La liste des résultats ne doit pas être nulle' );
   }
 }
