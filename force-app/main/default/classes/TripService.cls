@@ -42,7 +42,6 @@ public with sharing class TripService {
         // Récupérer les objets Opportunity correspondants aux IDs
         List<Opportunity> OpportunitysToProcess = OpportunitySelector.getOpportunityByIds(OpportunityIds);
         for (Opportunity opp : OpportunitysToProcess) {
-            System.debug('opp.StageName==' +opp.StageName);
                 if(opp.StageName=='Closed Won')
                     {
                         try {
