@@ -13,7 +13,15 @@ public with sharing class TripService {
         }
         
         if (!tripsToCancel.isEmpty()) {
-            update tripsToCancel;
+            if (Trip__c.getSObjectType().getDescribe().isUpdateable()) {
+                update tripsToCancel;
+            }
+            else {
+                throw new DmlException('Vous n avez pas l autorisation de modifier l objet Trip__c');
+            }
+
+
+            
         }
 
     }
@@ -22,18 +30,18 @@ public with sharing class TripService {
         for (Trip__c trip : TripIds) {
             // Vérification pour l'événement Insert
             if (Trigger.isInsert) {      
-                     // Vérifier que la date de fin est après la date de début
+                            // Vérifier que la date de fin est après la date de début
                             if ((trip.endDate__c != null && trip.startDate__c != null) && trip.endDate__c < trip.startDate__c ) {                              
                                 trip.addError('Cas  isInsert....La date de fin doit être après la date de début.');
                             }
             }
             // Vérification pour l'événement update
             if (Trigger.isUpdate) {
-                // Vérifier que la date de fin est après la date de début
-                if ((trip.endDate__c != null && trip.startDate__c != null) && trip.endDate__c < trip.startDate__c ) {
-                   
-                   trip.addError('Cas  isUpdate....La date de fin doit être après la date de début.');
-                }
+                            // Vérifier que la date de fin est après la date de début
+                            if ((trip.endDate__c != null && trip.startDate__c != null) && trip.endDate__c < trip.startDate__c ) {
+                            
+                            trip.addError('Cas  isUpdate....La date de fin doit être après la date de début.');
+                            }
             }
         }
     }
@@ -55,7 +63,13 @@ public with sharing class TripService {
                                 status__c='A venir' ,
                                 totalCost__c=opp.totalCost__c  
                               );
-                              insert newTrip;                            
+                              if (Trip__c.getSObjectType().getDescribe().isUpdateable()) {
+                                insert newTrip;  
+                              }
+                              else {
+                                throw new DmlException('Vous n avez pas l autorisation de modifier l objet Trip__c');
+                              }
+                                                        
 
                        } catch (Exception ex) {
                              System.debug('Erreur insert ...' + ex.getMessage());
@@ -91,7 +105,13 @@ public static void executeTripUpdate(List<Trip__c> trips)
 
     
     if (!tripsToUpdate.isEmpty()) {
-        update tripsToUpdate;
+        if (Trip__c.getSObjectType().getDescribe().isUpdateable()) {
+                update tripsToUpdate;
+        }
+        else {
+            throw new DmlException('Vous n avez pas l autorisation de modifier l objet Trip__c');
+        }
+       
     }
 }
 
