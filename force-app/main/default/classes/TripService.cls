@@ -4,13 +4,16 @@ public with sharing class TripService {
     }
 
     public static void executeTripCanceled(List<Trip__c> trips) {
-        List<Trip__c> tripsToCancel = new List<Trip__c>();        
-        for (Trip__c trip : trips) {
-            if (trip.numberOfParticipants__c != null) {
-                trip.Status__c = 'Annulé';
-                tripsToCancel.add(trip);
-            }
-        }
+        List<Trip__c> tripsToCancel = new List<Trip__c>();  
+        
+        if (Schema.sObjectType.Trip__c.fields.Status__c.isUpdateable()) {
+            for (Trip__c trip : trips) {
+                if (trip.numberOfParticipants__c != null) {
+                    trip.Status__c = 'Annulé';
+                    tripsToCancel.add(trip);
+                }
+            } 
+      }
         
         if (!tripsToCancel.isEmpty()) {
             if (Trip__c.getSObjectType().getDescribe().isUpdateable()) {
@@ -19,9 +22,6 @@ public with sharing class TripService {
             else {
                 throw new DmlException('Vous n avez pas l autorisation de modifier l objet Trip__c');
             }
-
-
-            
         }
 
     }
@@ -81,25 +81,27 @@ public static void executeTripUpdate(List<Trip__c> trips)
 {
     List<Trip__c> tripsToUpdate = new List<Trip__c>();
     Date today = Date.today();
-    for (Trip__c trip : trips) {       
 
-        // Vérifie si la date actuelle est inférieure à la date de début (A venir)
-        if (today < trip.startDate__c) {
-            trip.status__c = 'A venir';
-            tripsToUpdate.add(trip);
-        }
-        // Vérifie si la date actuelle est entre la date de début et la date de fin (En cours)
-        else if (today >= trip.startDate__c && today <= trip.endDate__c) {
-            trip.status__c = 'En cours';
-            tripsToUpdate.add(trip);
-        }
-        // Vérifie si la date actuelle est supérieure à la date de fin (Terminé)
-        else if (today > trip.endDate__c) {
-            trip.status__c = 'Terminé';
-            tripsToUpdate.add(trip);
+    if (Schema.sObjectType.Trip__c.fields.Status__c.isUpdateable()) {
+        for (Trip__c trip : trips) {       
+
+            // Vérifie si la date actuelle est inférieure à la date de début (A venir)
+            if (today < trip.startDate__c) {
+                trip.status__c = 'A venir';
+                tripsToUpdate.add(trip);
+            }
+            // Vérifie si la date actuelle est entre la date de début et la date de fin (En cours)
+            else if (today >= trip.startDate__c && today <= trip.endDate__c) {
+                trip.status__c = 'En cours';
+                tripsToUpdate.add(trip);
+            }
+            // Vérifie si la date actuelle est supérieure à la date de fin (Terminé)
+            else if (today > trip.endDate__c) {
+                trip.status__c = 'Terminé';
+                tripsToUpdate.add(trip);
+            }
         }
     }
-
     
     if (!tripsToUpdate.isEmpty()) {
         if (Trip__c.getSObjectType().getDescribe().isUpdateable()) {
