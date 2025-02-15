@@ -6,7 +6,7 @@ public with sharing class TripService {
     public static void executeTripCanceled(List<Trip__c> trips) {
         List<Trip__c> tripsToCancel = new List<Trip__c>();        
         for (Trip__c trip : trips) {
-            if (trip.numberOfParticipants__c < 10) {
+            if (trip.numberOfParticipants__c != null) {
                 trip.Status__c = 'Annulé';
                 tripsToCancel.add(trip);
             }
@@ -69,12 +69,9 @@ public with sharing class TripService {
                               else {
                                 throw new DmlException('Vous n avez pas l autorisation de modifier l objet Trip__c');
                               }
-                                                        
-
                        } catch (Exception ex) {
                              System.debug('Erreur insert ...' + ex.getMessage());
-                           throw new TripValidationException('La date de fin doit être supérieur a la date de debut'   );
-                             
+                           throw new TripValidationException('La date de fin doit être supérieur a la date de debut'   );                             
                         }
                     }
         }
