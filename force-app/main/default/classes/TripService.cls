@@ -12,18 +12,11 @@ public with sharing class TripService {
                     trip.Status__c = 'Annulé';
                     tripsToCancel.add(trip);
                 }
-            } 
+            }
+             if (!tripsToCancel.isEmpty()) {
+                update tripsToCancel;           
+            }
       }
-        
-        if (!tripsToCancel.isEmpty()) {
-            if (Trip__c.getSObjectType().getDescribe().isUpdateable()) {
-                update tripsToCancel;
-            }
-            else {
-                throw new DmlException('Vous n avez pas l autorisation de modifier l objet Trip__c');
-            }
-        }
-
     }
 
     public void validateTrip(List<Trip__c> TripIds) {
@@ -49,9 +42,9 @@ public with sharing class TripService {
     public void validateTripOnOpportunity(Set<Id> OpportunityIds) {
         // Récupérer les objets Opportunity correspondants aux IDs
         List<Opportunity> OpportunitysToProcess = OpportunitySelector.getOpportunityByIds(OpportunityIds);
-        for (Opportunity opp : OpportunitysToProcess) {
-                if(opp.StageName=='Closed Won')
-                    {
+       if (Trip__c.getSObjectType().getDescribe().isUpdateable()) {  
+         for (Opportunity opp : OpportunitysToProcess) {
+                if(opp.StageName=='Closed Won'){
                         try {
                             Trip__c newTrip = new Trip__c(
                                 Account__c =opp.accountid ,
@@ -62,26 +55,21 @@ public with sharing class TripService {
                                 startDate__c=opp.startDate__c  ,
                                 status__c='A venir' ,
                                 totalCost__c=opp.totalCost__c  
-                              );
-                              if (Trip__c.getSObjectType().getDescribe().isUpdateable()) {
-                                insert newTrip;  
-                              }
-                              else {
-                                throw new DmlException('Vous n avez pas l autorisation de modifier l objet Trip__c');
-                              }
-                       } catch (Exception ex) {
-                             System.debug('Erreur insert ...' + ex.getMessage());
-                           throw new TripValidationException('La date de fin doit être supérieur a la date de debut'   );                             
-                        }
-                    }
-        }
-        }
+                              );                            
+                              insert newTrip;  
+                             
+                            } 
+                            catch (Exception ex) {                           
+                            throw new TripValidationException('La date de fin doit être supérieur a la date de debut'   );                             
+                            }
+                }
+           }
+        }       
+    }
 
-public static void executeTripUpdate(List<Trip__c> trips)
-{
+public static void executeTripUpdate(List<Trip__c> trips){
     List<Trip__c> tripsToUpdate = new List<Trip__c>();
     Date today = Date.today();
-
     if (Schema.sObjectType.Trip__c.fields.Status__c.isUpdateable()) {
         for (Trip__c trip : trips) {       
 
@@ -101,17 +89,10 @@ public static void executeTripUpdate(List<Trip__c> trips)
                 tripsToUpdate.add(trip);
             }
         }
-    }
-    
-    if (!tripsToUpdate.isEmpty()) {
-        if (Trip__c.getSObjectType().getDescribe().isUpdateable()) {
+            if (!tripsToUpdate.isEmpty()) {
                 update tripsToUpdate;
-        }
-        else {
-            throw new DmlException('Vous n avez pas l autorisation de modifier l objet Trip__c');
-        }
-       
-    }
+            }
+    }   
 }
 
 }
