@@ -8,7 +8,7 @@ public with sharing class TripService {
         
         if (Schema.sObjectType.Trip__c.fields.Status__c.isUpdateable()) {
             for (Trip__c trip : trips) {
-                if (trip.numberOfParticipants__c != null) {
+                if ((trip.numberOfParticipants__c != null) && (trip.numberOfParticipants__c < 10)) {
                     trip.Status__c = 'Annulé';
                     tripsToCancel.add(trip);
                 }
@@ -22,20 +22,13 @@ public with sharing class TripService {
     public void validateTrip(List<Trip__c> TripIds) {
         for (Trip__c trip : TripIds) {
             // Vérification pour l'événement Insert
-            if (Trigger.isInsert) {      
+            if (Trigger.isInsert || Trigger.isUpdate) {      
                             // Vérifier que la date de fin est après la date de début
                             if ((trip.endDate__c != null && trip.startDate__c != null) && trip.endDate__c < trip.startDate__c ) {                              
-                                trip.addError('Cas  isInsert....La date de fin doit être après la date de début.');
+                                trip.addError('La date de fin doit être après la date de début.');
                             }
             }
-            // Vérification pour l'événement update
-            if (Trigger.isUpdate) {
-                            // Vérifier que la date de fin est après la date de début
-                            if ((trip.endDate__c != null && trip.startDate__c != null) && trip.endDate__c < trip.startDate__c ) {
-                            
-                            trip.addError('Cas  isUpdate....La date de fin doit être après la date de début.');
-                            }
-            }
+           
         }
     }
     
@@ -43,27 +36,35 @@ public with sharing class TripService {
         // Récupérer les objets Opportunity correspondants aux IDs
         List<Opportunity> OpportunitysToProcess = OpportunitySelector.getOpportunityByIds(OpportunityIds);
        if (Trip__c.getSObjectType().getDescribe().isUpdateable()) {  
+        List<Trip__c> tripToAdd=new List<Trip__c>();
          for (Opportunity opp : OpportunitysToProcess) {
-                if(opp.StageName=='Closed Won'){
+                if(opp.StageName=='Closed Won' ){
                         try {
                             Trip__c newTrip = new Trip__c(
                                 Account__c =opp.accountid ,
-                               destination__c =opp.destination__c ,
+                                destination__c =opp.destination__c ,
                                 endDate__c =opp.endDate__c ,
                                 numberOfParticipants__c =opp.numberOfParticipants__c ,
-                               Opportunity__c =opp.Id   ,
+                                Opportunity__c =opp.Id   ,
                                 startDate__c=opp.startDate__c  ,
                                 status__c='A venir' ,
                                 totalCost__c=opp.totalCost__c  
-                              );                            
-                              insert newTrip;  
-                             
+                              );                               
+                              tripToAdd.add(newTrip);  
                             } 
                             catch (Exception ex) {                           
-                            throw new TripValidationException('La date de fin doit être supérieur a la date de debut'   );                             
+                                throw new TripValidationException('La date de fin doit être supérieur a la date de debut'   );                             
                             }
                 }
-           }
+           }  
+           if (!tripToAdd.isEmpty()) {
+                try {
+                        insert tripToAdd; 
+                    } 
+                    catch (Exception ex) {
+                            throw new TripValidationException('La date de fin doit être supérieur a la date de debut'   );    
+                    }                  
+           }           
         }       
     }
 

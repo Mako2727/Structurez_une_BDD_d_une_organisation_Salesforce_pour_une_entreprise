@@ -8,6 +8,6 @@ public class TripSelector {
 
        // Méthode pour récupérer tous les voyages
        public static Database.QueryLocator getAllTrips() {
-        return Database.getQueryLocator('SELECT Id, Status__c, startDate__c, numberOfParticipants__c,endDate__c FROM Trip__c   WITH SECURITY_ENFORCED');
+        return Database.getQueryLocator('SELECT Id, Status__c, startDate__c, numberOfParticipants__c, endDate__c FROM Trip__c WHERE (startDate__c > TODAY) OR (startDate__c <= TODAY AND endDate__c >= TODAY) OR (endDate__c < TODAY) WITH SECURITY_ENFORCED');
     }
 }
